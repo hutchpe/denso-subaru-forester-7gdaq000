@@ -2,16 +2,16 @@
 
 The stock calibration pulled straight from this ECU's ROM (`7gdaq000.aus`), for
 anyone building a tune from the factory baseline. **Cell values are exact**
-(decoded from the binary). The **RPM and load axis labels are estimates** — the
+(decoded from the binary). The **RPM and load axis labels are estimates**. The
 ECU computes the axis indices by scaling the sensors rather than storing
-breakpoint arrays, so confirm axis positions against a datalog/timing light
-before trusting exact cell placement. See [tables.md](tables.md) for the axis
-discussion and [factory map images](#heatmaps) below.
+breakpoint arrays, so confirm axis positions against a datalog or timing light
+before you trust exact cell placement. See [tables.md](tables.md) for the axis
+discussion and the [factory map images](#heatmaps) below.
 
 > **Load axis = manifold pressure (kPa).** The factory ECM pinout confirms a MAP
-> sensor and no MAF, so this is a **speed-density** tune — build on an rpm × kPa
-> grid. If you're moving this onto a standalone ECU (the usual case — the factory
-> ECU can't practically be reflashed), start with
+> sensor and no MAF, so this is a **speed-density** tune. Build on an rpm × kPa
+> grid. If you are moving this onto a standalone ECU (the usual case, because you
+> cannot practically reflash the factory ECU), start with
 > **[aftermarket-porting.md](aftermarket-porting.md)**.
 
 | | |
@@ -26,7 +26,7 @@ discussion and [factory map images](#heatmaps) below.
 
 ### Ignition advance — °BTDC
 
-Base spark map `0x210E` (11 load rows x 19 rpm columns). Top row = highest load, bottom row `L0` = lowest load (overrun). RPM header is a **uniform estimate**; cell values are exact (`raw/128`).
+Base spark map `0x210E` (11 load rows x 19 rpm columns). Top row = highest load, bottom row `L0` = lowest load (overrun). The RPM header is a **uniform estimate**. Cell values are exact (`raw/128`).
 
 | load\rpm_est | 0 | 340 | 680 | 1020 | 1370 | 1710 | 2050 | 2390 | 2730 | 3070 | 3410 | 3750 | 4100 | 4440 | 4780 | 5120 | 5460 | 5800 | 6140 |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -43,15 +43,15 @@ Base spark map `0x210E` (11 load rows x 19 rpm columns). Top row = highest load,
 | L0 | 16.0 | 16.0 | 16.0 | 16.7 | 17.5 | 18.1 | 18.3 | 18.3 | 18.6 | 18.6 | 18.8 | 18.6 | 19.4 | 22.0 | 26.1 | 30.4 | 31.2 | 30.0 | 30.0 |
 
 Machine-readable: [`data/ignition_degrees.csv`](../data/ignition_degrees.csv).
-Reading it: ~16° at idle, climbing to ~36° at light-load cruise, pulled back to
-single digits / 0° at high load and low rpm (knock protection). It is the
-physical inverse of the fuel map.
+How to read it: about 16° at idle, climbing to about 36° at light-load cruise,
+pulled back to single digits or 0° at high load and low rpm (knock protection).
+It is the physical inverse of the fuel map.
 
 ---
 
 ### Fuel / injection — raw counts
 
-Base fuel map `0x23EC` (7 load rows x 19 rpm). `L0` is the zero overrun/fuel-cut row. Values are raw injection-quantity counts (not ms). RPM header is a uniform estimate.
+Base fuel map `0x23EC` (7 load rows x 19 rpm). `L0` is the zero overrun/fuel-cut row. Values are raw injection-quantity counts (not ms). The RPM header is a uniform estimate.
 
 | load\rpm_est | 0 | 340 | 680 | 1020 | 1370 | 1710 | 2050 | 2390 | 2730 | 3070 | 3410 | 3750 | 4100 | 4440 | 4780 | 5120 | 5460 | 5800 | 6140 |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
@@ -65,13 +65,13 @@ Base fuel map `0x23EC` (7 load rows x 19 rpm). `L0` is the zero overrun/fuel-cut
 
 Machine-readable: [`data/fuel_table.csv`](../data/fuel_table.csv). These are raw
 injection-quantity counts (0–1585), **not milliseconds or VE**. Fuel rises with
-load; the `L0` row and the high-rpm/low-load corner read 0 (deceleration fuel
+load. The `L0` row and the high-rpm/low-load corner read 0 (deceleration fuel
 cut).
 
 > **Converting to a VE table (Speeduino / MegaSquirt / RomRaider):** this is an
 > injection-quantity map, not a VE model, so there is no exact conversion. A
-> normalised starting shape is in [`data/ve_table_relative.csv`](../data/ve_table_relative.csv);
-> set the absolute level from your engine (`reqFuel`: displacement, injector
+> normalised starting shape is in [`data/ve_table_relative.csv`](../data/ve_table_relative.csv).
+> Set the absolute level from your engine (`reqFuel`: displacement, injector
 > flow, cylinders, target AFR). See [tables.md](tables.md#relative-ve).
 
 ## Heatmaps
@@ -84,16 +84,17 @@ cut).
 
 ## Using this data
 
-Reflashing the factory ECU isn't practical (no known community flash tool for
+Reflashing the factory ECU is not practical (no known community flash tool for
 this early Denso unit), so the normal path is to **port these maps to an
-aftermarket/standalone ECU** — see **[aftermarket-porting.md](aftermarket-porting.md)**
-for the full recipe (load axis, VE conversion, sensor scaling, firing order).
+aftermarket/standalone ECU**. See
+**[aftermarket-porting.md](aftermarket-porting.md)** for the full recipe (load
+axis, VE conversion, sensor scaling, firing order).
 
-- Confirm the **ignition scale** (the `÷128` → °BTDC factor) against a timing
-  light at a known point before trusting absolute advance numbers.
-- Build on an **rpm × MAP (kPa)** grid — this is a speed-density tune.
+- Confirm the **ignition scale** (the `÷128` to °BTDC factor) against a timing
+  light at a known point before you trust absolute advance numbers.
+- Build on an **rpm × MAP (kPa)** grid. This is a speed-density tune.
 - A wrong spark map can cause detonation. Start conservative on timing, change
   one thing at a time, and tune on a wideband with knock monitoring.
-- (If you *do* attempt the factory ROM: there's no trivial whole-image checksum,
-  but a sub-range validation routine may exist — locate it first. This is
-  advanced/unsupported — see [HANDOVER.md](../HANDOVER.md).)
+- If you *do* attempt the factory ROM: there is no trivial whole-image checksum,
+  but a sub-range validation routine may exist, so locate it first. This is
+  advanced and unsupported. See [HANDOVER.md](../HANDOVER.md).

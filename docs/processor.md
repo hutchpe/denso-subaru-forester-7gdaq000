@@ -4,18 +4,19 @@
 
 A **proprietary Denso 8-bit microcontroller**. This ECU is a Subaru unit (see
 [hardware.md](hardware.md)), but the MCU belongs to the common Denso 8-bit core
-family that Denso used across its engine computers of the late-1980s to
-mid-1990s — the same core lineage found in Denso-built Toyota **TCCS** (Toyota
-Computer-Controlled System) ECUs. (TCCS is Toyota's name for that system; this
-is a Subaru application of the same silicon, not a TCCS unit.) It was
-mask-produced under Denso's own part numbers (community teardowns report a main
-CPU marked `D151801-xxxx`, a knock-processor `D151801-xxxx`, an ADC
-`D949577-xxxx`, typically ~64-pin packages, sometimes fabricated by Toshiba).
-There is **no public datasheet**; all tooling is community-built (custom
+family. Denso used that family across its engine computers of the late-1980s to
+mid-1990s. It is the same core lineage found in Denso-built Toyota **TCCS**
+(Toyota Computer-Controlled System) ECUs. TCCS is Toyota's name for that system.
+This is a Subaru application of the same silicon, not a TCCS unit.
+
+Denso mask-produced it under its own part numbers. Community teardowns report a
+main CPU marked `D151801-xxxx`, a knock-processor `D151801-xxxx`, and an ADC
+`D949577-xxxx`, typically in about 64-pin packages, sometimes fabricated by
+Toshiba. There is **no public datasheet**. All tooling is community-built (custom
 disassemblers / IDA / Ghidra processor modules).
 
-The 64 KB program + calibration lives in an external `27C512`-class EPROM — this
-image.
+The 64 KB program + calibration lives in an external `27C512`-class EPROM. That
+is this image.
 
 ## Family it is based on
 
@@ -26,8 +27,8 @@ Intel architecture.
 
 > Note: this early Denso 8-bit unit predates the Hitachi SuperH `SH7055/7058`
 > ECUs that later Subarus (and much of the WRX/STI tuning scene) run. Those are
-> a different, newer architecture — unrelated to this chip — so SH-based tools
-> and maps do not apply here.
+> a different, newer architecture, unrelated to this chip, so SH-based tools and
+> maps do not apply here.
 
 The "6800/6805-derived" conclusion is an **inference from the instruction set**,
 not a licensing fact, but it is well supported.
@@ -43,7 +44,7 @@ not a licensing fact, but it is well supported.
 | Disable interrupts | `0x05` | 6800/6805 `SEI`-equivalent |
 | Call / jump | `9D BB <addr16>` and `9D FB <addr16>`; interrupt stubs are `9D BB <tgt> 9F FF` | compact accumulator ISA |
 
-## Vectors & interrupts
+## Vectors and interrupts
 
 - **Reset vector:** `0xFF00` (big-endian) → entry at `0xF810`.
 - **Interrupt vector table:** `0xFF40–0xFF6F`, big-endian pointers into 6-byte

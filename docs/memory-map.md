@@ -1,8 +1,8 @@
 # Memory map
 
 The image splits cleanly into low RAM/IO, a calibration-data block, and program
-code, determined by control-flow-opcode density and by tracing which addresses
-the code reads as table bases.
+code. Two signals determined the split: control-flow-opcode density, and tracing
+which addresses the code reads as table bases.
 
 | Range | Contents |
 |---|---|
@@ -18,13 +18,13 @@ the code reads as table bases.
 
 ## Notes
 
-- `0x8A82` (decimal 35458) is the dominant fill word in the unused low region;
+- `0x8A82` (decimal 35458) is the dominant fill word in the unused low region.
   `0x0000` fills other gaps. A grayscale render of the data region is at
   [`images/data_region_overview.png`](../images/data_region_overview.png).
-- "RAM below ~`0x1800`, ROM calibration above" was confirmed by: the code
-  *writes* low addresses (index/scratch) and *reads* `0x1800–0x36FF` as table
-  bases; `FD B9` loads that point below `0x1800` hit fill or scratch, those at
-  `0x1800+` hit real tabular data.
+- "RAM below about `0x1800`, ROM calibration above" was confirmed by the access
+  pattern. The code *writes* low addresses (index/scratch) and *reads*
+  `0x1800–0x36FF` as table bases. `FD B9` loads that point below `0x1800` hit
+  fill or scratch. Those at `0x1800+` hit real tabular data.
 - No trivial whole-image checksum is present (the image does not sum to zero or
-  a complement). A validation routine over a sub-range may exist in code; locate
-  it before reflashing.
+  a complement). A validation routine over a sub-range may exist in code. Locate
+  it before you reflash.

@@ -1,8 +1,9 @@
 # Do NOT commit ECU firmware (copyrighted). Supply your own dump.
 *.bin
 *.hex
-# Generated outputs (regenerate with scripts/)
+# Generated / derived outputs
 __pycache__/
 *.pyc
+report.html
 # Do NOT commit agent handover
 HANDOVER.md

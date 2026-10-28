@@ -1,23 +1,24 @@
-# ECM I/O pinout & signals (factory service manual)
+# ECM I/O pinout and signals (factory service manual)
 
-The ECU's input/output signals, from the Subaru Forester service manual, with
-the measured signal voltages. This is the Rosetta Stone for the ROM work: it
-names the real sensors and actuators, confirms the load input is a **MAP
-(pressure) sensor** (so the ECU is **speed-density**, not MAF), and gives signal
-levels you can reuse when choosing/scaling sensors for an aftermarket ECU.
+The ECU's input and output signals, from the Subaru Forester service manual,
+with the measured signal voltages. This table cross-references the ROM against
+real hardware. It names the real sensors and actuators, confirms the load input
+is a **MAP (pressure) sensor** (so the ECU is **speed-density**, not MAF), and
+gives signal levels you can reuse when you choose or scale sensors for an
+aftermarket ECU.
 
 The ECM has two connectors, **E22** (26-pin) and **B84** (34-pin). The
 `CHECK BOARD` columns in the manual are for the dealer diagnostic harness and are
-**not needed for tuning** — only the **ECM Connector/Terminal** columns matter.
-Verify connector designations against your own harness before probing.
+**not needed for tuning**. Only the **ECM Connector/Terminal** columns matter.
+Verify connector designations against your own harness before you probe.
 
 ![ECU connectors E22 and B84](../images/ecu-connectors.png)
 
 > Source: excerpt from the Subaru Forester factory service manual, included for
-> reference. Pin *data* (identities, voltages) is factual; verify against your
+> reference. Pin *data* (identities, voltages) is factual. Verify against your
 > vehicle.
 
-## Inputs — sensors & switches
+## Inputs — sensors and switches
 
 | Signal | ECM pin | Ign ON (eng off) | Idling | Notes for tuning |
 |---|---|---|---|---|
@@ -43,7 +44,7 @@ Verify connector designations against your own harness before probing.
 | Back-up power (KAM) | B84-34 | 10–13 | 13–14 | always-on 12 V (keep-alive memory) |
 | Control-unit power | B84-9, B84-17 | 10–13 | 13–14 | switched 12 V supply |
 
-## Outputs — injectors, ignition & actuators
+## Outputs — injectors, ignition and actuators
 
 | Signal | ECM pin | Ign ON (eng off) | Idling | Notes for tuning |
 |---|---|---|---|---|
@@ -74,10 +75,10 @@ Verify connector designations against your own harness before probing.
 
 ## Load axis = MAP
 
-The only load-related analog input is the **pressure sensor** (E22-18) — there is
+The only load-related analog input is the **pressure sensor** (E22-18). There is
 **no MAF / airflow meter** in the pinout. So the factory strategy is
 **speed-density**: fuel and ignition are indexed by **manifold pressure × rpm**.
-This resolves the ROM's load axis (`0x0966`): it is **manifold absolute pressure
+This resolves the ROM's load axis (`0x0966`). It is **manifold absolute pressure
 (kPa)**, not an airflow count.
 
 A rough transfer function from the two manual data points (treating ign-on ≈
@@ -88,10 +89,9 @@ V ≈ 0.028 × kPa + 0.66      →      kPa ≈ (V − 0.66) / 0.028
 ```
 
 Treat this as an **estimate** (the idle-kPa anchor is assumed). If you reuse the
-factory sensor, calibrate it against two known pressures; if you fit an
-aftermarket MAP sensor, just build your tables on a kPa axis and use that
-sensor's own scaling. The takeaway that matters: **build the fuel and ignition
-tables on a MAP (kPa) load axis.**
+factory sensor, calibrate it against two known pressures. If you fit an
+aftermarket MAP sensor, build your tables on a kPa axis and use that sensor's own
+scaling. Either way, build the fuel and ignition tables on a MAP (kPa) load axis.
 
 ## What this confirms in the ROM
 
