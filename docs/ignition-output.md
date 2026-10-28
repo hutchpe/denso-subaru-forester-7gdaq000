@@ -1,10 +1,10 @@
 # Ignition output path — from computed advance to the coil
 
-This traces the spark path end to end: from the ignition map lookup, through the
-degree-to-timer conversion, to the hardware output-compare register that fires
-the igniter. It resolves open item #4 (the final ignition output register) to
-the register level. The method is static control-flow tracing of the
-undocumented Denso MCU. Confidence is flagged per step.
+This traces the spark path end to end, from the ignition map lookup through the
+degree-to-timer conversion to the hardware output-compare register that fires
+the igniter, resolving open item #4 (the final ignition output register) to the
+register level. The method is static control-flow tracing of the undocumented
+Denso MCU, with confidence flagged per step.
 
 ## Summary of the chain
 
@@ -46,9 +46,9 @@ The results accumulate in RAM:
 7484: 11 BB 0A BE / 14 BB 0A C0 / 71 F0 0A BC  ; 0x0ABC = 0x0ABE + 0x0AC0 (store @0x748C)
 ```
 
-So **`0x0ABC` holds the final spark advance** (base + corrections), still in the
-raw/128 degree representation. `0x0ABA` holds a companion value (dwell / coil
-charge angle), computed alongside.
+So `0x0ABC` holds the final spark advance (base + corrections), still in the
+raw/128 degree representation, and `0x0ABA` holds a companion value (dwell / coil
+charge angle) computed alongside it.
 
 ### 2. Degrees to timer ticks via `0xDDBC` / `0xDE00` (VERIFIED routine)
 The scheduler at `0x7480-0x74D2` feeds the advance and dwell through the 16-bit
@@ -61,11 +61,11 @@ scaling routine `0xDDBC` (and its sibling `0xDE00`):
 74D2: 71 F5 0A 9C            ; store scheduled fire time -> 0x0A9C
 ```
 
-`0xDDBC` is a multiply/divide helper (`BD B9 … D1 A7 04 B1 A7 06 … D3 79 08 00`).
-It multiplies the angle by the current engine period and rescales. That is the
+`0xDDBC` is a multiply/divide helper (`BD B9 … D1 A7 04 B1 A7 06 … D3 79 08 00`)
+that multiplies the angle by the current engine period and rescales, which is the
 standard crank-degrees-to-timer-count conversion. The result (`0x0A9C`) is the
-absolute timer value at which the next event must occur, gated by the
-spark-state word `0x1555`.
+absolute timer value at which the next event must occur, gated by the spark-state
+word `0x1555`.
 
 ### 3. Crank input-capture ISR `0xE1A4` (vector `0xFF40`) (VERIFIED)
 This is the **highest-priority interrupt** (first entry in the vector table) and
@@ -78,12 +78,12 @@ E1C7: 11 BB 09 38 / 14 BB 09 48 ; maintain inter-tooth period (0x0938/0x0948)
 ```
 
 The maintained period at `0x0938` is what the main loop converts to RPM
-(`0x08EE`, writer at `0x3FA3`), and what the degree-to-tick converter uses. So
-the same ISR both measures engine speed and anchors the spark schedule.
+(`0x08EE`, writer at `0x3FA3`) and what the degree-to-tick converter uses, so the
+same ISR both measures engine speed and anchors the spark schedule.
 
 ### 4. Ignition output-compare register `0x0212` (VERIFIED path, INFERRED pin)
-The output stage programs a 16-bit output-compare register. Its **top bit
-(0x8000) is the output level** and its low 15 bits are the compare time:
+The output stage programs a 16-bit output-compare register whose top bit
+(0x8000) is the output level and whose low 15 bits are the compare time:
 
 ```
 E3C3: 11 BB 02 12 / 15 79 7F FF / 71 F0 02 12 ; clear bit15 (output low)
@@ -97,20 +97,20 @@ programmed level at the compare match, so the coil charges (dwell) and fires at
 the computed crank angle. **`0x0212` is the ignition timing output-compare
 register.**
 
-A second 16-bit compare register, **`0x0222`**, is programmed the same way. It
-is written from many more sites and is also read by the fuel/injection code
-(`0x85FC`, `0x8648`). That is consistent with it being the **injector**
+A second 16-bit compare register, **`0x0222`**, is programmed the same way, but
+it is written from many more sites and is also read by the fuel/injection code
+(`0x85FC`, `0x8648`), which is consistent with it being the **injector**
 output-compare channel rather than ignition.
 
 ## Confidence
 - Advance assembly at `0x0ABC`, the converter routines, the scheduled-time store
-  at `0x0A9C`, and the crank ISR `0xE1A4` reading input-capture `0x0242`:
+  at `0x0A9C`, and the crank ISR `0xE1A4` reading input-capture `0x0242` are all
   **VERIFIED** by direct control-flow tracing.
-- `0x0212` = ignition output-compare (against `0x0222` = injection): the
+- For `0x0212` = ignition output-compare (against `0x0222` = injection), the
   register mechanics (bit15 level + compare time, fed by the degree-to-tick
-  converter) are verified. The **physical pin assignment** (which is IGt vs INJ)
-  is a strong inference from usage, not pin-probed. Confirm on a scope/timing
-  light before you rely on it for a hardware mod.
+  converter) are verified, but the **physical pin assignment** (which is IGt vs
+  INJ) is a strong inference from usage rather than pin-probed. Confirm it on a
+  scope or timing light before you rely on it for a hardware mod.
 
 ## Registers referenced (I/O map additions)
 | Addr | Role |

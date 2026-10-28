@@ -4,19 +4,19 @@
 
 A **proprietary Denso 8-bit microcontroller**. This ECU is a Subaru unit (see
 [hardware.md](hardware.md)), but the MCU belongs to the common Denso 8-bit core
-family. Denso used that family across its engine computers of the late-1980s to
-mid-1990s. It is the same core lineage found in Denso-built Toyota **TCCS**
-(Toyota Computer-Controlled System) ECUs. TCCS is Toyota's name for that system.
-This is a Subaru application of the same silicon, not a TCCS unit.
+family that Denso used across its engine computers from the late 1980s to the
+mid 1990s, the same lineage found in Denso-built Toyota **TCCS** (Toyota
+Computer-Controlled System) ECUs. TCCS is Toyota's name for that system, so this
+is a Subaru application of the same silicon rather than a TCCS unit.
 
-Denso mask-produced it under its own part numbers. Community teardowns report a
-main CPU marked `D151801-xxxx`, a knock-processor `D151801-xxxx`, and an ADC
-`D949577-xxxx`, typically in about 64-pin packages, sometimes fabricated by
-Toshiba. There is **no public datasheet**. All tooling is community-built (custom
-disassemblers / IDA / Ghidra processor modules).
+Denso mask-produced it under its own part numbers, and community teardowns
+report a main CPU marked `D151801-xxxx`, a knock-processor `D151801-xxxx`, and an
+ADC `D949577-xxxx`, typically in about 64-pin packages and sometimes fabricated
+by Toshiba. There is **no public datasheet**, so all tooling is community-built
+(custom disassemblers / IDA / Ghidra processor modules).
 
-The 64 KB program + calibration lives in an external `27C512`-class EPROM. That
-is this image.
+The 64 KB program and calibration live in an external `27C512`-class EPROM,
+which is this image.
 
 ## Family it is based on
 

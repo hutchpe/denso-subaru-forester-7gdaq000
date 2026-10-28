@@ -1,18 +1,17 @@
 # Factory base maps — Subaru Forester SF (2001, AUS)
 
 The stock calibration pulled straight from this ECU's ROM (`7gdaq000.aus`), for
-anyone building a tune from the factory baseline. **Cell values are exact**
-(decoded from the binary). The **RPM and load axis labels are estimates**. The
-ECU computes the axis indices by scaling the sensors rather than storing
-breakpoint arrays, so confirm axis positions against a datalog or timing light
-before you trust exact cell placement. See [tables.md](tables.md) for the axis
-discussion and the [factory map images](#heatmaps) below.
+anyone building a tune from the factory baseline. The **cell values are exact**
+(decoded from the binary), but the **RPM and load axis labels are estimates**,
+because the ECU computes the axis indices by scaling the sensors rather than
+storing breakpoint arrays. Confirm axis positions against a datalog or timing
+light before you trust exact cell placement. See [tables.md](tables.md) for the
+axis discussion and the [factory map images](#heatmaps) below.
 
-> **Load axis = manifold pressure (kPa).** The factory ECM pinout confirms a MAP
-> sensor and no MAF, so this is a **speed-density** tune. Build on an rpm × kPa
-> grid. If you are moving this onto a standalone ECU (the usual case, because you
-> cannot practically reflash the factory ECU), start with
-> **[aftermarket-porting.md](aftermarket-porting.md)**.
+> **Load axis = manifold pressure (kPa).** This is a speed-density tune, so
+> build on an rpm × kPa grid. If you are moving it onto a standalone ECU, which
+> is the usual case because you cannot practically reflash the factory ECU,
+> start with **[aftermarket-porting.md](aftermarket-porting.md)**.
 
 | | |
 |---|---|
@@ -42,10 +41,11 @@ Base spark map `0x210E` (11 load rows x 19 rpm columns). Top row = highest load,
 | L1 | 16.0 | 16.0 | 16.0 | 18.9 | 21.9 | 24.5 | 25.1 | 25.0 | 26.5 | 26.5 | 27.2 | 26.5 | 29.7 | 34.1 | 36.2 | 35.2 | 36.3 | 34.7 | 34.7 |
 | L0 | 16.0 | 16.0 | 16.0 | 16.7 | 17.5 | 18.1 | 18.3 | 18.3 | 18.6 | 18.6 | 18.8 | 18.6 | 19.4 | 22.0 | 26.1 | 30.4 | 31.2 | 30.0 | 30.0 |
 
-Machine-readable: [`data/ignition_degrees.csv`](../data/ignition_degrees.csv).
-How to read it: about 16° at idle, climbing to about 36° at light-load cruise,
-pulled back to single digits or 0° at high load and low rpm (knock protection).
-It is the physical inverse of the fuel map.
+The machine-readable version is
+[`data/ignition_degrees.csv`](../data/ignition_degrees.csv). It reads about 16°
+at idle, climbing to about 36° at light-load cruise and pulled back to single
+digits or 0° at high load and low rpm for knock protection, which makes it the
+physical inverse of the fuel map.
 
 ---
 
@@ -63,16 +63,16 @@ Base fuel map `0x23EC` (7 load rows x 19 rpm). `L0` is the zero overrun/fuel-cut
 | L1 | 969 | 921 | 955 | 579 | 682 | 341 | 280 | 61 | 136 | 109 | 286 | 98 | 0 | 511 | 0 | 0 | 0 | 0 | 0 |
 | L0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
 
-Machine-readable: [`data/fuel_table.csv`](../data/fuel_table.csv). These are raw
-injection-quantity counts (0–1585), **not milliseconds or VE**. Fuel rises with
-load. The `L0` row and the high-rpm/low-load corner read 0 (deceleration fuel
-cut).
+The machine-readable version is
+[`data/fuel_table.csv`](../data/fuel_table.csv). These are raw injection-quantity
+counts (0–1585), **not milliseconds or VE**. Fuel rises with load, and the `L0`
+row and the high-rpm/low-load corner read 0 for deceleration fuel cut.
 
 > **Converting to a VE table (Speeduino / MegaSquirt / RomRaider):** this is an
 > injection-quantity map, not a VE model, so there is no exact conversion. A
-> normalised starting shape is in [`data/ve_table_relative.csv`](../data/ve_table_relative.csv).
-> Set the absolute level from your engine (`reqFuel`: displacement, injector
-> flow, cylinders, target AFR). See [tables.md](tables.md#relative-ve).
+> normalised starting shape is in [`data/ve_table_relative.csv`](../data/ve_table_relative.csv),
+> and you set the absolute level from your engine (`reqFuel`: displacement,
+> injector flow, cylinders, target AFR). See [tables.md](tables.md#relative-ve).
 
 ## Heatmaps
 
@@ -92,9 +92,9 @@ axis, VE conversion, sensor scaling, firing order).
 
 - Confirm the **ignition scale** (the `÷128` to °BTDC factor) against a timing
   light at a known point before you trust absolute advance numbers.
-- Build on an **rpm × MAP (kPa)** grid. This is a speed-density tune.
-- A wrong spark map can cause detonation. Start conservative on timing, change
+- Build on an **rpm × MAP (kPa)** grid, since this is a speed-density tune.
+- A wrong spark map can cause detonation, so start conservative on timing, change
   one thing at a time, and tune on a wideband with knock monitoring.
-- If you *do* attempt the factory ROM: there is no trivial whole-image checksum,
-  but a sub-range validation routine may exist, so locate it first. This is
-  advanced and unsupported. See [HANDOVER.md](../HANDOVER.md).
+- If you *do* attempt the factory ROM, note that there is no trivial whole-image
+  checksum, but a sub-range validation routine may exist, so locate it first.
+  This is advanced and unsupported. See [HANDOVER.md](../HANDOVER.md).

@@ -22,8 +22,8 @@ All 69 code-referenced tables are catalogued in
 
 Each is set up with `FD B9 <map>` plus the rpm (`0x08EE`) and load (`0x0966`)
 index variables, then `9D BB DCB4`. The ignition map loads its indices via the
-`FD B5/FD B6` register form, so an automated index scan shows none for `0x210E`.
-It is the same rpm×load pair as fuel.
+`FD B5/FD B6` register form, so an automated index scan shows none for `0x210E`,
+but it is the same rpm×load pair as fuel.
 
 ## Ignition advance — `0x210E`
 
@@ -34,8 +34,8 @@ It is the same rpm×load pair as fuel.
   (2) its lookup routine chains ignition correction tables
   `0x20E0 / 0x20F0 / 0x20F4 / 0x20F6 / 0x20F8`; (3) its load/rpm shape is the
   physical inverse of the fuel map.
-- **Output path now traced** to the igniter output-compare register. See
-  [`ignition-output.md`](ignition-output.md). Final advance lands in RAM at
+- **Output path now traced** to the igniter output-compare register (see
+  [`ignition-output.md`](ignition-output.md)): the final advance lands in RAM at
   `0x0ABC`, is converted degrees-to-timer ticks, and drives output-compare
   `0x0212`.
 
@@ -43,9 +43,9 @@ Data: [`data/ignition_degrees.csv`](../data/ignition_degrees.csv).
 
 ## Fuel / injection — `0x23EC`
 
-Raw injection-quantity counts, 0–1585. Rises with load. The lowest-load row is
-the overrun/fuel-cut line, and the high-rpm/low-load corner drops to 0
-(deceleration fuel cut). The injector output-compare channel is `0x0222`.
+Raw injection-quantity counts, 0–1585, rising with load. The lowest-load row is
+the overrun/fuel-cut line, and the high-rpm/low-load corner drops to 0 for
+deceleration fuel cut. The injector output-compare channel is `0x0222`.
 
 Data: [`data/fuel_table.csv`](../data/fuel_table.csv).
 
@@ -62,7 +62,7 @@ coherent groups:
 - **Throttle/accel (`0x090E`), 8 tables:** map `0x18E7` plus the
   acceleration-enrichment group `0x2790 / 0x27A2 / 0x27B4`.
 - **ADC-channel sensor (`0x08DC`, raw `0x00AA`), 3 tables:** `0x297A`, the 4×19
-  map `0x2A6C`, `0x2B32`. This is an air-temp or baro/altitude family.
+  map `0x2A6C`, and `0x2B32`, an air-temp or baro/altitude family.
 
 ## Other notable tables
 
@@ -84,25 +84,24 @@ are computed by near-linear scaling of the sensors, so the axes are close to
 - The shared map preamble axis descriptor's rpm full-scale term `0x6000` (24576)
   corresponds to about 6144 rpm, matching the about 6250 rpm rev limit.
 - Load (`0x0966`) is assembled with smoothing in a dedicated routine (`~0x4808`,
-  raw read via `0x662E`). The factory ECM pinout ([pinout.md](pinout.md)) shows
-  a **MAP (pressure) sensor and no MAF**, so **load = manifold absolute pressure
-  (kPa)** and the ECU is speed-density. The "fuel map" is an injection-quantity
-  map rather than a VE model regardless.
+  raw read via `0x662E`). The factory pinout ([pinout.md](pinout.md)) confirms
+  load is manifold absolute pressure (kPa), so the ECU is speed-density. The
+  "fuel map" is an injection-quantity map rather than a VE model regardless.
 
 So the RPM axis is published here as a **uniform ~0–6150 rpm estimate** (step
-about 341 rpm over 19 points). The **load axis is MAP (kPa)**. The direction is
+about 341 rpm over 19 points), and the load axis is MAP (kPa). Its direction is
 certain (low→high), but the exact kPa breakpoints are not stored in the ROM, so
 anchor them with a log or the sensor transfer function
-([pinout.md](pinout.md#load-axis--map)). Cell *values* are exact. Axis *labels*
-are estimates.
+([pinout.md](pinout.md#load-axis--map)). The cell *values* are exact, and the
+axis *labels* are estimates.
 
 ## Relative VE
 
-The Denso fuel map is an **injection-quantity** map, not a VE model, so there is
-no exact conversion to volumetric efficiency.
+The Denso fuel map is an **injection-quantity** map rather than a VE model, so
+there is no exact conversion to volumetric efficiency.
 [`data/ve_table_relative.csv`](../data/ve_table_relative.csv) is the fuel surface
-normalised to 0–100% (max = 100%). It is a usable *starting shape* for a
-TunerStudio (Speeduino / MegaSquirt) VE table, **not** a calibrated VE.
+normalised to 0–100% (max = 100%), a usable *starting shape* for a TunerStudio
+(Speeduino / MegaSquirt) VE table rather than a calibrated VE.
 
 Caveats:
 
@@ -112,5 +111,5 @@ Caveats:
   rises steeply with load because it is fuel demand, and the fuel-cut cells read
   0. For a genuine VE you must divide out MAP, which needs the load axis in real
   kPa.
-- A Speeduino VE table is typically 16×16 on RPM×kPa. Resample from the native
+- A Speeduino VE table is typically 16×16 on RPM×kPa, so resample from the native
   19×7.

@@ -18,13 +18,13 @@ which addresses the code reads as table bases.
 
 ## Notes
 
-- `0x8A82` (decimal 35458) is the dominant fill word in the unused low region.
-  `0x0000` fills other gaps. A grayscale render of the data region is at
+- `0x8A82` (decimal 35458) is the dominant fill word in the unused low region,
+  and `0x0000` fills other gaps. A grayscale render of the data region is at
   [`images/data_region_overview.png`](../images/data_region_overview.png).
-- "RAM below about `0x1800`, ROM calibration above" was confirmed by the access
-  pattern. The code *writes* low addresses (index/scratch) and *reads*
-  `0x1800–0x36FF` as table bases. `FD B9` loads that point below `0x1800` hit
-  fill or scratch. Those at `0x1800+` hit real tabular data.
+- The split (RAM below about `0x1800`, ROM calibration above) was confirmed by
+  the access pattern: the code writes low addresses (index/scratch) and reads
+  `0x1800–0x36FF` as table bases, and `FD B9` loads that point below `0x1800` hit
+  fill or scratch while those at `0x1800+` hit real tabular data.
 - No trivial whole-image checksum is present (the image does not sum to zero or
-  a complement). A validation routine over a sub-range may exist in code. Locate
-  it before you reflash.
+  a complement), though a validation routine over a sub-range may exist in code,
+  so locate it before you reflash.

@@ -1,14 +1,12 @@
 # Porting the factory tune to an aftermarket ECU
 
 This is the repo's main practical use. **Reflashing the factory Denso ECU is not
-a realistic option** for an enthusiast. There is no known community flash tool
+a realistic option** for an enthusiast: there is no known community flash tool
 for this early Denso 8-bit unit (unlike the later Hitachi-SH Subaru ECUs that
-RomRaider/Tactrix support). The calibration lives in a ROM that is not
+RomRaider/Tactrix support), the calibration lives in a ROM that is not
 field-reprogrammable in situ, and any checksum would have to be defeated blind.
-So the intended use of everything here is as a **documented factory baseline to
-replicate on a standalone ECU** (Link, Haltech, MoTeC, Emtron, Speeduino,
-MegaSquirt, and similar).
-
+So everything here is meant as a documented factory baseline to replicate on a
+standalone ECU such as Link, Haltech, MoTeC, Emtron, Speeduino or MegaSquirt.
 The factory calibration is a useful starting point, and most of it ports
 cleanly.
 
@@ -25,36 +23,36 @@ cleanly.
 
 ## Engine and load basics
 
-- **EJ202**: 2.0 L (1994 cc) SOHC naturally-aspirated flat-four, about 498
+- **EJ202**: a 2.0 L (1994 cc) SOHC naturally-aspirated flat-four, about 498
   cc/cyl.
-- **Speed-density**: the factory ECU has a **MAP sensor and no MAF**, so load is
-  **manifold pressure**. Build your VE/fuel and ignition tables on an **rpm ×
-  kPa** axis. A typical NA kPa axis runs about 20–105 kPa.
-- The factory maps are 19 rpm columns × (7 fuel / 11 ignition) load rows, on a
-  roughly uniform rpm axis of about 0–6150. Resample onto your ECU's grid
+- **Speed-density**: load is manifold pressure, so build your VE/fuel and
+  ignition tables on an **rpm × kPa** axis. A typical NA kPa axis runs about
+  20–105 kPa.
+- The factory maps are 19 rpm columns × (7 fuel / 11 ignition) load rows on a
+  roughly uniform rpm axis of about 0–6150, so resample them onto your ECU's grid
   (commonly 16×16) by interpolation. The values matter, the grid size does not.
 
 ## Ignition
 
 The factory ignition map is already stored in **°BTDC** on rpm×load, so it drops
-almost straight into an aftermarket ignition table. Full numbers:
-[factory-tune.md](factory-tune.md). Raw CSV:
+almost straight into an aftermarket ignition table. For the full numbers see
+[factory-tune.md](factory-tune.md), and for the raw CSV see
 [`ignition_degrees.csv`](../data/ignition_degrees.csv).
 
-- Range 0–36°. About 16° idle, about 36° light-load cruise, pulled to single
-  digits at high load/low rpm.
+- Range 0–36°, reading about 16° at idle, about 36° at light-load cruise, and
+  single digits at high load and low rpm.
 - **Confirm the scale** (the ROM stores advance as `raw/128`) against a timing
   light at a known point before you trust absolute numbers.
 - Start **conservative** (pull 2–4° against factory) on pump fuel until you have
-  logged knock, then work back up. The factory has no wideband or modern knock
-  control. You do, so use them.
+  logged knock, then work back up. The factory tune had no wideband or modern
+  knock control, and you do, so use them.
 
 ## Fuel: converting injection-quantity to VE
 
 The factory fuel map stores a raw **injection quantity** (0–1585 counts), not VE
-and not ms. There is no exact conversion, but the **shape** is a good VE
-starting point ([`ve_table_relative.csv`](../data/ve_table_relative.csv),
-normalised 0–100%). To anchor the absolute level on your ECU:
+and not ms. There is no exact conversion, but the **shape** is a good VE starting
+point ([`ve_table_relative.csv`](../data/ve_table_relative.csv), normalised
+0–100%). To anchor the absolute level on your ECU:
 
 1. Set your global fuel parameters from **your** hardware: displacement 1994 cc,
    4 cylinders, **your injector flow** (factory NA EJ injectors are about
@@ -64,9 +62,9 @@ normalised 0–100%). To anchor the absolute level on your ECU:
 3. Tune closed-loop/short-term trims to flatten it, then verify WOT on a
    wideband.
 
-Because it is an injection-quantity map (not VE ÷ MAP), it rises more steeply
-with load than a true VE surface. Expect to flatten the top of the load axis as
-you calibrate. See [tables.md](tables.md#relative-ve).
+Because it is an injection-quantity map rather than VE ÷ MAP, it rises more
+steeply with load than a true VE surface, so expect to flatten the top of the
+load axis as you calibrate. See [tables.md](tables.md#relative-ve).
 
 ## Sensors: reuse or replace (scalings from the factory pinout)
 
@@ -86,39 +84,40 @@ From [pinout.md](pinout.md):
 ## Outputs, firing order and trigger
 
 - **Firing order 1-3-2-4.**
-- **Ignition:** the factory is **wasted spark, 2 channels**. Coil A fires cyl
-  **1 & 2**, coil B fires **3 & 4** (pins E22-3 and E22-9). You can replicate
-  wasted-spark, or upgrade to coil-on-plug **sequential**. Sequential needs a
-  **cam-sync** signal, and this factory system appears to run **crank-only**
-  (wasted spark + grouped injection need no cam sensor). Verify whether your
-  engine has a usable camshaft position sensor before you plan full sequential.
-- **Injection:** the factory is **grouped/paired**. Injectors 1&2 fire together
-  (E22-7), 3&4 together (E22-6). Aftermarket can run grouped (crank-only) or full
-  sequential (with cam sync).
+- **Ignition:** the factory runs **wasted spark on 2 channels**, with coil A
+  firing cyl **1 & 2** and coil B firing **3 & 4** (pins E22-3 and E22-9). You
+  can replicate wasted-spark, or upgrade to coil-on-plug **sequential**.
+  Sequential needs a **cam-sync** signal, and this factory system appears to run
+  **crank-only** (wasted spark and grouped injection need no cam sensor), so
+  verify whether your engine has a usable camshaft position sensor before you
+  plan full sequential.
+- **Injection:** the factory is **grouped/paired**, with injectors 1&2 firing
+  together (E22-7) and 3&4 together (E22-6). Aftermarket can run grouped
+  (crank-only) or full sequential (with cam sync).
 - **Aux outputs to wire:** idle-air-control valve (PWM, E22-4), fuel-pump relay,
-  radiator fan relay(s), A/C relay, EVAP purge solenoid (PWM), tacho output,
+  radiator fan relay(s), A/C relay, EVAP purge solenoid (PWM), tacho output, and
   MIL. All are low-side relay/solenoid drives. See [pinout.md](pinout.md).
 
 ## Suggested starting-point checklist
 
-1. Wire the engine harness to your ECU using [pinout.md](pinout.md). Set crank =
-   **reluctor**, firing order **1-3-2-4**.
+1. Wire the engine harness to your ECU using [pinout.md](pinout.md), setting
+   crank = **reluctor** and firing order **1-3-2-4**.
 2. Configure **speed-density**, rpm × **kPa** axes.
 3. Load the **ignition** map from [`ignition_degrees.csv`](../data/ignition_degrees.csv)
    (resampled), minus a safety margin.
-4. Load the **VE shape** from [`ve_table_relative.csv`](../data/ve_table_relative.csv).
-   Set global fuel from your injectors/displacement/AFR.
+4. Load the **VE shape** from [`ve_table_relative.csv`](../data/ve_table_relative.csv),
+   and set global fuel from your injectors, displacement and AFR.
 5. Set **rev limit** about 6250 (start lower).
-6. Start wasted-spark + grouped injection (crank-only). Move to sequential later
-   if you add cam sync.
+6. Start wasted-spark + grouped injection (crank-only), and move to sequential
+   later if you add cam sync.
 7. First-start, idle, then **dyno/road-tune** on a wideband, logging knock.
 
 ## Important caveats
 
-- **Axis labels are estimates.** Cell *values* are exact, but the rpm and kPa
-  breakpoints are inferred (the ECU scales sensors to index the maps, it does not
-  store breakpoint arrays). Treat the maps as *shapes* and re-reference the axes
-  to your own logging. See [tables.md](tables.md#axes).
-- This is an NA tune. It is a **baseline**, not a finished calibration. Validate
-  everything on your engine, on a dyno where possible, with a wideband and knock
-  monitoring.
+- **Axis labels are estimates.** The cell *values* are exact, but the rpm and
+  kPa breakpoints are inferred, because the ECU scales sensors to index the maps
+  rather than storing breakpoint arrays. Treat the maps as *shapes* and
+  re-reference the axes to your own logging. See [tables.md](tables.md#axes).
+- This is an NA tune, and it is a **baseline** rather than a finished
+  calibration, so validate everything on your engine, on a dyno where possible,
+  with a wideband and knock monitoring.

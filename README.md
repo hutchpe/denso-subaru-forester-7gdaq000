@@ -6,14 +6,14 @@ flat-four). It serves two audiences:
 
 - **Tuners** who want the **factory base maps** (the stock fuel and ignition
   tables) as a starting point for a tune, almost always on an **aftermarket or
-  standalone ECU** (you cannot practically reflash the factory Denso ECU). Start
-  with **[docs/aftermarket-porting.md](docs/aftermarket-porting.md)**, or go to
-  [Factory base maps](#factory-base-maps) and
+  standalone ECU**, since you cannot practically reflash the factory Denso ECU.
+  Start with **[docs/aftermarket-porting.md](docs/aftermarket-porting.md)**, or
+  go to [Factory base maps](#factory-base-maps) and
   [docs/factory-tune.md](docs/factory-tune.md).
 - **Engineers** reverse-engineering their own Denso ECU image from this era. The
   [how it was done](#how-it-was-reverse-engineered) docs cover the processor,
   memory map, calibration format, table-finding method, and the ignition output
-  path. The method reuses on similar Denso ROMs.
+  path, and the method reuses on similar Denso ROMs.
 
 | | |
 |---|---|
@@ -23,14 +23,14 @@ flat-four). It serves two audiences:
 | Denso hardware no. | `112500-0103` (`DENSO JAPAN`, 12 V) |
 | Calibration ID | `7gdaq000.aus` (`.aus` = Australian market, string @ `0xEF68`) |
 | Build stamp | `EGC02 / 1996-07-02` (@ `0xF800`) |
-| Induction | **Speed-density**: MAP sensor, no MAF (load axis = kPa) |
+| Induction | **Speed-density** (MAP sensor, no MAF; load axis = kPa) |
 | Image | 65,536 bytes, `27C512`-class EPROM, big-endian 16-bit |
 | ROM md5 | `c310d4c5bbc46012b6c8b0e5c67fce05` |
 | Processor | proprietary Denso 8-bit MCU (Motorola 6800/6805 lineage) |
 
-Which number is which: `22611AF000` is **Subaru's** part number. `112500-0103`
-is **Denso's** hardware number. Both are part/model numbers, not a per-unit
-serial. See the details and board walkthrough in
+Which number is which: `22611AF000` is **Subaru's** part number and
+`112500-0103` is **Denso's** hardware number, both of them part/model numbers
+rather than a per-unit serial. See the details and board walkthrough in
 [docs/hardware.md](docs/hardware.md).
 
 ![ECU board](images/ecu-board.jpg)
@@ -71,11 +71,11 @@ Supporting files:
 
 ## Factory base maps
 
-The stock tune, decoded from the ROM. **Cell values are exact. Axis labels are
-estimates.** The ECU scales the sensors to index the maps rather than storing
-breakpoint arrays, so confirm axis positions against a datalog before you trust
-exact cell placement. Full numeric tables are in
-**[docs/factory-tune.md](docs/factory-tune.md)**. The raw CSVs are under
+The stock tune, decoded from the ROM. The cell values are exact, but the axis
+labels are estimates: the ECU scales the sensors to index the maps rather than
+storing breakpoint arrays, so confirm axis positions against a datalog before
+you trust exact cell placement. The full numeric tables are in
+**[docs/factory-tune.md](docs/factory-tune.md)**, and the raw CSVs are under
 [`data/`](data/).
 
 | Map | Address | Size | Scale / units |
@@ -86,16 +86,15 @@ exact cell placement. Full numeric tables are in
 
 ![Fuel vs ignition](images/fuel_vs_ignition.png)
 
-Both maps are indexed **rpm × load**, and the load axis is **manifold pressure
-(kPa)**. The factory ECM pinout confirms a MAP sensor and no MAF, so this is a
-**speed-density** tune. Build aftermarket tables on an rpm × kPa grid. The
-ignition surface reads about 16° at idle and about 36° at light-load cruise,
-pulled to 0–4° under high load and low rpm. That shape is the inverse of the
-fuel map. The fuel map is an **injection-quantity** map, not VE and not ms. A
-normalised VE starting shape for TunerStudio/RomRaider is in
-[`data/ve_table_relative.csv`](data/ve_table_relative.csv). See
+Both maps are indexed on **rpm × load**, where the load axis is **manifold
+pressure (kPa)**, so this is a speed-density tune and aftermarket tables should
+sit on an rpm × kPa grid. The ignition surface reads about 16° at idle and about
+36° at light-load cruise, falling to 0–4° under high load and low rpm, which is
+the inverse of the fuel map. The fuel map stores an **injection quantity**
+rather than VE or ms, so a normalised VE starting shape for TunerStudio/RomRaider
+is in [`data/ve_table_relative.csv`](data/ve_table_relative.csv). See
 [docs/factory-tune.md](docs/factory-tune.md) for the complete cell-by-cell
-tables and [docs/aftermarket-porting.md](docs/aftermarket-porting.md) for how to
+tables, and [docs/aftermarket-porting.md](docs/aftermarket-porting.md) for how to
 put them on a standalone ECU.
 
 ---
@@ -103,7 +102,7 @@ put them on a standalone ECU.
 ## How it was reverse-engineered
 
 For engineers working on a similar Denso image. Static analysis of the ROM
-established everything below. The docs flag confidence throughout.
+established everything below, and the docs flag confidence throughout.
 
 | Topic | Doc |
 |---|---|
@@ -119,8 +118,8 @@ established everything below. The docs flag confidence throughout.
 | The physical ECU (part numbers, board, photos) | [docs/hardware.md](docs/hardware.md) |
 
 The method in one line: the firmware addresses every table with the idiom
-`FD B9 <table>` + `FD BB <index_var>` + a call to an interpolator. Scanning for
-`FD B9` targets in `0x1800–0x36FF` yields the authoritative list of **69
+`FD B9 <table>` + `FD BB <index_var>` + a call to an interpolator, so scanning
+for `FD B9` targets in `0x1800–0x36FF` yields the authoritative list of **69
 tables**, and the index variable names the sensor that drives each one.
 
 ### Reproduce it yourself
@@ -145,14 +144,14 @@ the bottom)**.
 
 - **The ROM binary is not committed.** ECU firmware is copyrighted, so supply
   your own dump. `.gitignore` excludes `*.bin`.
-- This is independent interpretation for research and personal tuning. It has no
+- This is independent interpretation for research and personal tuning, with no
   affiliation with Subaru or Denso. The "6800/6805-lineage" processor conclusion
-  is an inference from the instruction set. Several sensor identities and the
-  ignition output pin are also inferred (flagged per item in the docs).
+  is an inference from the instruction set, and several sensor identities and the
+  ignition output pin are inferred too (flagged per item in the docs).
 - The pinout images in [docs/pinout.md](docs/pinout.md) are excerpts from the
   Subaru service manual, included for reference. The pin *data* (identities,
-  voltages) is factual. Verify against your own vehicle/harness.
+  voltages) is factual, so verify it against your own vehicle and harness.
 - A bad tune can damage an engine, and a wrong spark map can cause detonation.
-  Everything here is a **baseline**, not a finished calibration. Verify on your
-  engine (dyno + wideband + knock monitoring) and **use at your own risk.**
+  Everything here is a **baseline**, not a finished calibration, so verify it on
+  your engine (dyno + wideband + knock monitoring) and **use at your own risk.**
 - Corrections and additional cal IDs welcome via issues/PRs.
