@@ -1,0 +1,70 @@
+addr,dims,interp,index_vars,driving_input,confidence,Q12_range,prior_guess
+0x186A,34x1,MAPi_9CE0,0BC4,aux state var,inferred-low,0.00-1.50,rev-limit constant block
+0x18AE,18x1,help_DB1C,RPM,engine RPM,verified,0.00-0.29,curve (zero-start)
+0x18D2,10x1,MAP2D,RPM,engine RPM,verified,0.00-6.00,small map (DCB4)
+0x18E7,11x17,MAPi_9CE0,090E,throttle/accel input (TPS),inferred-med,0.00-15.38,2D map
+0x1A88,9x1,CURVE1D,092A,aux state var,inferred-low,0.49-0.57,decreasing curve
+0x1AD6,9x1,CURVE1D,0924,coolant temp (ECT) [dominant warmup/correction input],inferred-med,0.00-0.01,curve/constants
+0x1AF0,3x1,CURVE1D,0924,coolant temp (ECT) [dominant warmup/correction input],inferred-med,0.38-0.38,curve/constants
+0x1B00,14x1,CURVE1D,0924,coolant temp (ECT) [dominant warmup/correction input],inferred-med,0.04-0.50,curve/constants
+0x1B24,14x1,CURVE1D,0924,coolant temp (ECT) [dominant warmup/correction input],inferred-med,0.01-0.04,curve/constants
+0x1B4A,11x1,CURVE1D,0924,coolant temp (ECT) [dominant warmup/correction input],inferred-med,0.02-0.32,decreasing curve
+0x1B68,15x1,CURVE1D,"0924, RPM",coolant temp (ECT) [dominant warmup/correction input],inferred-med,0.00-5.50,curve/constants
+0x1B86,18x1,help_DBC0,"LOAD, RPM",engine load (smoothed; physical unit undecoded),verified-dir,0.00-2.00,curve/constants
+0x1BAA,13x4,help_DBC0,"LOAD, RPM",engine load (smoothed; physical unit undecoded),verified-dir,0.00-2.20,2D map
+0x1C3A,18x1,help_DBC0,"LOAD, RPM",engine load (smoothed; physical unit undecoded),verified-dir,0.00-2.00,curve (zero-start)
+0x1C5E,4x13,help_DBC0,"LOAD, RPM",engine load (smoothed; physical unit undecoded),verified-dir,0.00-7.97,2D map
+0x1CC8,7x1,CURVE1D,LOAD,engine load (smoothed; physical unit undecoded),verified-dir,0.13-0.13,curve/constants
+0x1CDE,4x11,CURVE1D,0A32,aux state var,inferred-low,0.00-7.50,2D map
+0x1D36,11x1,CURVE1D,0924,coolant temp (ECT) [dominant warmup/correction input],inferred-med,0.77-5.87,decreasing curve
+0x1D54,11x1,CURVE1D,0924,coolant temp (ECT) [dominant warmup/correction input],inferred-med,0.77-4.70,decreasing curve
+0x1D72,11x1,CURVE1D,0924,coolant temp (ECT) [dominant warmup/correction input],inferred-med,0.55-1.05,decreasing curve
+0x1D90,11x1,CURVE1D,0924,coolant temp (ECT) [dominant warmup/correction input],inferred-med,0.55-1.05,decreasing curve
+0x1DAE,11x1,CURVE1D,0924,coolant temp (ECT) [dominant warmup/correction input],inferred-med,0.73-1.40,decreasing curve
+0x1DD4,9x1,CURVE1D,-,(no index capture / constant block),-,0.00-0.17,curve (zero-start)
+0x1DE6,10x1,CURVE1D,090E,throttle/accel input (TPS),inferred-med,0.00-4.50,curve (zero-start)
+0x1DFA,11x1,CURVE1D,0924,coolant temp (ECT) [dominant warmup/correction input],inferred-med,0.00-7.00,curve (zero-start)
+0x1E10,12x12,MAP2D,"LOAD, RPM",engine load (smoothed; physical unit undecoded),verified-dir,0.00-14.00,special/cranking map (DCB4)
+0x1F5E,35x1,CURVE1D,0924,coolant temp (ECT) [dominant warmup/correction input],inferred-med,0.00-9.00,curve/constants
+0x1FA4,38x1,help_DBC0,"092C, 09CE",var 092C,inferred-low,0.00-8.00,curve/constants
+0x1FF0,13x1,CURVE1D,LOAD,engine load (smoothed; physical unit undecoded),verified-dir,0.00-7.98,curve (zero-start)
+0x200A,12x1,CURVE1D,0914,aux state var,inferred-low,0.00-0.21,curve/constants
+0x2022,8x1,CURVE1D,-,(no index capture / constant block),-,0.00-0.50,curve (zero-start)
+0x2032,11x1,CURVE1D,0924,coolant temp (ECT) [dominant warmup/correction input],inferred-med,0.50-1.83,decreasing curve
+0x2064,11x1,CURVE1D,0924,coolant temp (ECT) [dominant warmup/correction input],inferred-med,1.38-3.75,decreasing curve
+0x20E0,12x1,CURVE1D,LOAD,engine load (smoothed; physical unit undecoded),verified-dir,0.00-12.00,ignition correction curve
+0x20F8,11x1,CURVE1D,08E8,ignition-correction state (warmup/knock timer),inferred-low,0.00-3.75,curve (zero-start)
+0x210E,11x19,MAP2D,-,(no index capture / constant block),-,0.00-6.00,"IGNITION advance map (DCB4, falls w/load)"
+0x22C4,16x1,CURVE1D,-,(no index capture / constant block),-,0.00-12.00,curve (zero-start)
+0x22E4,11x5,CURVE1D,0924,coolant temp (ECT) [dominant warmup/correction input],inferred-med,0.00-16.00,2D map
+0x2370,4x13,CURVE1D,0924,coolant temp (ECT) [dominant warmup/correction input],inferred-med,0.00-11.00,2D map
+0x23EC,7x19,MAP2D,"LOAD, RPM",engine load (smoothed; physical unit undecoded),verified-dir,0.00-6.00,"FUEL / injection map (DCB4, rises w/load)"
+0x253C,17x1,CURVE1D,LOAD,engine load (smoothed; physical unit undecoded),verified-dir,0.00-6.50,curve/constants
+0x255E,21x1,CURVE1D,"LOAD, 0924",engine load (smoothed; physical unit undecoded),verified-dir,0.00-10.00,curve/constants
+0x2588,9x10,CURVE1D,0924,coolant temp (ECT) [dominant warmup/correction input],inferred-med,0.00-15.20,2D map
+0x2660,8x5,CURVE1D,097C,aux state var,inferred-low,0.00-16.00,2D map
+0x26BC,9x10,MAPi_DC2E,"LOAD, RPM",engine load (smoothed; physical unit undecoded),verified-dir,0.00-1.75,rev-limit / RPM-threshold map
+0x2790,9x1,CURVE1D,090E,throttle/accel input (TPS),inferred-med,0.00-0.50,curve (zero-start)
+0x27A2,9x1,CURVE1D,090E,throttle/accel input (TPS),inferred-med,0.00-0.25,curve (zero-start)
+0x27B4,4x12,CURVE1D,090E,throttle/accel input (TPS),inferred-med,0.00-16.00,2D map
+0x2816,36x1,CURVE1D,LOAD,engine load (smoothed; physical unit undecoded),verified-dir,0.00-4.00,curve/constants
+0x285E,11x6,help_DBC0,"090E, LOAD",throttle/accel input (TPS),inferred-med,0.00-4.00,2D map
+0x28E8,34x1,CURVE1D,08DE,aux state var,inferred-low,0.00-15.75,curve/constants
+0x292C,39x1,CURVE1D,08E0,aux state var,inferred-low,0.00-16.00,curve (zero-start)
+0x297A,25x1,CURVE1D,08DC,analog sensor via ADC ch 0x00AA (IAT or baro),inferred-low,0.00-9.77,curve/constants
+0x29AC,7x1,CURVE1D,08E8,ignition-correction state (warmup/knock timer),inferred-low,0.00-0.50,curve/constants
+0x29BA,9x1,CURVE1D,090E,throttle/accel input (TPS),inferred-med,0.00-0.50,curve (zero-start)
+0x29CC,3x1,CURVE1D,0924,coolant temp (ECT) [dominant warmup/correction input],inferred-med,0.01-0.02,curve/constants
+0x29DA,3x1,CURVE1D,0924,coolant temp (ECT) [dominant warmup/correction input],inferred-med,0.38-0.38,curve/constants
+0x2A6C,4x19,CURVE1D,08DC,analog sensor via ADC ch 0x00AA (IAT or baro),inferred-low,0.00-14.00,2D map
+0x2B1C,11x1,CURVE1D,092A,aux state var,inferred-low,0.00-10.00,curve/constants
+0x2B32,7x1,help_DBC0,"08DC, LOAD",analog sensor via ADC ch 0x00AA (IAT or baro),inferred-low,0.00-0.35,curve/constants
+0x2B7E,11x1,CURVE1D,0924,coolant temp (ECT) [dominant warmup/correction input],inferred-med,0.00-0.29,decreasing curve
+0x2B9C,11x1,CURVE1D,0924,coolant temp (ECT) [dominant warmup/correction input],inferred-med,1.00-1.00,disabled correction (all x1.0)
+0x2CDA,4x28,CURVE1D,0B68,aux subsystem input,inferred-low,0.00-11.00,2D map
+0x2DD0,20x1,CURVE1D,0B78,aux subsystem input (speed/gear/EGR?),inferred-low,0.00-1.00,curve (zero-start)
+0x2DF8,19x1,CURVE1D,0B78,aux subsystem input (speed/gear/EGR?),inferred-low,0.00-1.00,curve (zero-start)
+0x2E1E,11x14,CURVE1D,0B78,aux subsystem input (speed/gear/EGR?),inferred-low,0.00-14.00,2D map
+0x2F60,5x10,help_DBC0,"090E, 0BD2",throttle/accel input (TPS),inferred-med,0.00-0.11,2D map
+0x2FC6,7x7,help_DBC0,0BCE,aux subsystem input,inferred-low,0.00-3.00,2D map
+0x3028,13x1,CURVE1D,-,(no index capture / constant block),-,0.50-0.55,rising axis
